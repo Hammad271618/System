@@ -1,0 +1,18 @@
+# Credentials & Local Keys (Strictly Private)
+accounts.json
+.passkey
+*.docx
+*.xlsx
+
+# Logs
+*.log
+mcs_login.log
+
+# Python / Build Artifacts
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+.vscode/
+.idea/
