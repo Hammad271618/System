@@ -1,3 +1,6 @@
+# Executables
+*.exe
+
 # Credentials & Local Keys (Strictly Private)
 accounts.json
 .passkey
