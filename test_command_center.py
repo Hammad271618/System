@@ -90,6 +90,7 @@ class TestServiceController(unittest.TestCase):
             self.assertIn("cmdline", inst)
 
     def test_is_service_process_filtering(self):
+        self.assertTrue(self.ctrl._is_service_process("AutoLogin.exe", ""))
         self.assertTrue(self.ctrl._is_service_process("MCS-AutoLogin.exe", ""))
         self.assertTrue(self.ctrl._is_service_process("pythonw.exe", "pythonw.exe main.py"))
         self.assertTrue(self.ctrl._is_service_process("python.exe", "python.exe tray_app.py"))
@@ -162,7 +163,7 @@ class TestBuildPackage(unittest.TestCase):
         import build_package
         with tempfile.TemporaryDirectory() as tmp_dir:
             # Create mock dummy files in tmp_dir
-            for fn in ["MCS-AutoLogin.exe", "MCS-CommandCenter.exe", "accounts.json", "command_center.bat"]:
+            for fn in ["AutoLogin.exe", "CommandCenter.exe", "accounts.json", "command_center.bat"]:
                 with open(os.path.join(tmp_dir, fn), "w") as f:
                     f.write("mock")
             zip_res = build_package.build_from_frozen(tmp_dir)
@@ -170,8 +171,8 @@ class TestBuildPackage(unittest.TestCase):
             import zipfile
             with zipfile.ZipFile(zip_res, "r") as zf:
                 names = zf.namelist()
-                self.assertIn("MCS-AutoLogin-v1.0/MCS-AutoLogin.exe", names)
-                self.assertIn("MCS-AutoLogin-v1.0/README.txt", names)
+                self.assertIn("AutoLogin-v1.0/AutoLogin.exe", names)
+                self.assertIn("AutoLogin-v1.0/README.txt", names)
 
 
 class TestFortinetClientLogout(unittest.TestCase):

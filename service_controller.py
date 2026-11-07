@@ -31,7 +31,7 @@ class ServiceController:
         try:
             import base64
             ps_script = (
-                "Get-CimInstance Win32_Process -Filter \"Name LIKE '%python%' OR Name = 'MCS-AutoLogin.exe'\" "
+                "Get-CimInstance Win32_Process -Filter \"Name LIKE '%python%' OR Name = 'AutoLogin.exe' OR Name = 'MCS-AutoLogin.exe'\" "
                 "| Select-Object ProcessId, Name, CommandLine | ConvertTo-Json -Compress"
             )
             b64_cmd = base64.b64encode(ps_script.encode("utf-16le")).decode("ascii")
@@ -94,7 +94,7 @@ class ServiceController:
         name_lower = (name or "").lower()
         cmd_lower = (cmdline or "").lower()
 
-        if "mcs-autologin.exe" in name_lower or "mcs-autologin.exe" in cmd_lower:
+        if "autologin.exe" in name_lower or "autologin.exe" in cmd_lower:
             return True
 
         if "main.py" in cmd_lower or "tray_app.py" in cmd_lower:
@@ -132,7 +132,9 @@ class ServiceController:
             pids_str = ", ".join(str(i["pid"]) for i in running_inst)
             return False, f"Service is already running (PID: {pids_str})"
 
-        exe_path = os.path.join(self.app_dir, "MCS-AutoLogin.exe")
+        exe_path = os.path.join(self.app_dir, "AutoLogin.exe")
+        if not os.path.exists(exe_path):
+            exe_path = os.path.join(self.app_dir, "MCS-AutoLogin.exe")
         flags = 0
         if sys.platform == "win32":
             DETACHED_PROCESS = 0x00000008

@@ -78,9 +78,9 @@ class MCSTrayApp:
 
         # Build system tray
         self.icon = pystray.Icon(
-            "MCSAutoLogin",
+            "AutoLogin",
             create_status_icon(ICON_COLORS["yellow"]),
-            "MCS Auto-Login: Starting...",
+            "AutoLogin: Starting...",
             menu=self.build_menu()
         )
         self.notifier.set_tray_icon(self.icon)
@@ -101,7 +101,7 @@ class MCSTrayApp:
             pystray.MenuItem("⚡ Log In Now / Check Internet", self.on_force_check),
             pystray.MenuItem("🔄 Switch to Next Account", self.on_switch_account),
             pystray.MenuItem("♻️ Reset All Accounts (Daily Reset)", self.on_reset_accounts),
-            pystray.MenuItem("📶 Roam to Strongest MCS Wi-Fi", self.on_roam_wifi),
+            pystray.MenuItem("📶 Roam to Strongest Wi-Fi", self.on_roam_wifi),
             pystray.MenuItem("🔧 Fix IP (Cycle Static IP)", self.on_fix_ip),
             pystray.MenuItem("🔄 Reset IP to DHCP", self.on_reset_dhcp),
             pystray.Menu.SEPARATOR,
@@ -123,7 +123,7 @@ class MCSTrayApp:
         self.current_ssid = self.detector.get_current_wifi_ssid() or "Ethernet / Disconnected"
         
         stats = self.account_mgr.get_stats()
-        tooltip = f"MCS: {status_text} | ID: {stats['current_user']} ({stats['available']}/{stats['total']})"
+        tooltip = f"AutoLogin: {status_text} | ID: {stats['current_user']} ({stats['available']}/{stats['total']})"
         
         # pystray tooltip has 128 char limit in Windows
         if len(tooltip) > 125:
@@ -147,7 +147,7 @@ class MCSTrayApp:
                 if len(portal_rejected_ids) > 1:
                     self.account_mgr.restore_accounts(portal_rejected_ids)
                 self.update_tray("red", "All accounts exhausted!")
-                self.notifier.notify("MCS Alert", "All 29 accounts have reached their quota limits!")
+                self.notifier.notify("AutoLogin Alert", f"All {stats['total']} accounts have reached their quota limits!")
                 return False
 
             if acc["id"] in tried_in_this_cycle:
@@ -159,7 +159,7 @@ class MCSTrayApp:
             tried_in_this_cycle.add(acc["id"])
 
             self.update_tray("yellow", f"Logging in as {acc['username']}...")
-            self.notifier.notify("MCS Auto-Login", f"Logging into Fortinet with account #{acc['id']} ({acc['username']})...")
+            self.notifier.notify("AutoLogin", f"Logging into Fortinet with account #{acc['id']} ({acc['username']})...")
 
             try:
                 self.client.session.cookies.update(self.detector.session.cookies)
@@ -175,22 +175,22 @@ class MCSTrayApp:
 
             if success:
                 self.update_tray("green", f"Online as {acc['username']}")
-                self.notifier.notify("MCS Connected!", f"Successfully authenticated as {acc['username']} (ID #{acc['id']}).")
+                self.notifier.notify("AutoLogin Connected!", f"Successfully authenticated as {acc['username']} (ID #{acc['id']}).")
                 return True
 
             if status_code == "QUOTA_EXHAUSTED":
                 self.account_mgr.mark_current_exhausted(message)
-                self.notifier.notify("MCS Quota Hit", f"Account #{acc['id']} ({acc['username']}) reached limit. Switching to next...")
+                self.notifier.notify("AutoLogin Quota Hit", f"Account #{acc['id']} ({acc['username']}) reached limit. Switching to next...")
                 self.account_mgr.get_next_account()
             elif status_code == "INVALID_CREDENTIALS":
                 self.account_mgr.mark_current_invalid(message)
-                self.notifier.notify("MCS Auth Failed", f"Account #{acc['id']} ({acc['username']}) rejected. Trying next...")
+                self.notifier.notify("AutoLogin Auth Failed", f"Account #{acc['id']} ({acc['username']}) rejected. Trying next...")
                 self.account_mgr.get_next_account()
             elif status_code == "PORTAL_REJECTED":
                 # Portal returned the login page again without unlocking internet (e.g. silent quota limit or concurrent session limit)
                 portal_rejected_ids.append(acc["id"])
                 self.account_mgr.mark_current_exhausted(message)
-                self.notifier.notify("MCS Portal Rejected", f"Account #{acc['id']} ({acc['username']}) rejected by portal. Switching to next...")
+                self.notifier.notify("AutoLogin Portal Rejected", f"Account #{acc['id']} ({acc['username']}) rejected by portal. Switching to next...")
                 self.account_mgr.get_next_account()
             else:
                 consecutive_net_failures += 1
@@ -303,7 +303,7 @@ class MCSTrayApp:
                             logger.info("DHCP failed or APIPA address detected. Attempting auto-heal...")
                             healed, msg = self.ip_cycler.auto_heal_ip()
                             if healed:
-                                self.notifier.notify("MCS IP Cycler", msg)
+                                self.notifier.notify("AutoLogin IP Cycler", msg)
                                 self.force_check_event.set()
                         self.update_tray("gray", "Offline (No Network)")
                         self.adaptive_interval = 5
@@ -327,30 +327,30 @@ class MCSTrayApp:
         self.client.logout(gateway_ip=gw_ip)
         next_acc = self.account_mgr.get_next_account()
         if next_acc:
-            self.notifier.notify("MCS Account Switched", f"Active account switched to #{next_acc['id']}: {next_acc['username']}")
+            self.notifier.notify("AutoLogin Account Switched", f"Active account switched to #{next_acc['id']}: {next_acc['username']}")
             self.on_force_check()
         else:
-            self.notifier.notify("MCS Alert", "No available accounts left to switch to!")
+            self.notifier.notify("AutoLogin Alert", "No available accounts left to switch to!")
 
     def on_reset_accounts(self, icon=None, item=None):
         self.account_mgr.reset_all_accounts()
-        self.notifier.notify("MCS Accounts Reset", "All 29 accounts have been reset to 'Available'.")
+        self.notifier.notify("AutoLogin Accounts Reset", "All accounts have been reset to 'Available'.")
         self.on_force_check()
 
     def on_roam_wifi(self, icon=None, item=None):
         roamed, msg = self.wifi_roamer.auto_roam()
-        self.notifier.notify("MCS Wi-Fi Roamer", msg)
+        self.notifier.notify("AutoLogin Wi-Fi Roamer", msg)
         self.on_force_check()
 
     def on_fix_ip(self, icon=None, item=None):
         success, msg = self.ip_cycler.auto_heal_ip()
-        self.notifier.notify("MCS IP Cycler", msg)
+        self.notifier.notify("AutoLogin IP Cycler", msg)
         self.on_force_check()
 
     def on_reset_dhcp(self, icon=None, item=None):
         success = self.ip_cycler.revert_to_dhcp()
         msg = "Restored Wi-Fi to DHCP" if success else "Failed to restore DHCP"
-        self.notifier.notify("MCS IP Cycler", msg)
+        self.notifier.notify("AutoLogin IP Cycler", msg)
         self.on_force_check()
 
     def on_open_dashboard(self, icon=None, item=None):
@@ -378,7 +378,7 @@ class MCSTrayApp:
         self.icon.menu = self.build_menu()
 
     def on_exit(self, icon=None, item=None):
-        logger.info("Exiting MCS Auto-Login app...")
+        logger.info("Exiting AutoLogin app...")
         self.running = False
         self.force_check_event.set()
         self.icon.stop()

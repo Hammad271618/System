@@ -1,10 +1,10 @@
 @echo off
-title MCS Build ^& Export Standalone Package
+title AutoLogin Build ^& Export Standalone Package
 chcp 65001 >nul
 cd /d "%~dp0"
 
 echo ================================================================
-echo          MCS FORTINET AUTO-LOGIN - PORTABLE EXPORT BUILDER       
+echo             AUTOLOGIN - PORTABLE EXPORT BUILDER       
 echo ================================================================
 echo.
 echo Installing PyInstaller and compiling standalone binaries...
@@ -16,7 +16,9 @@ python build_package.py %*
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo Opening output directory in Explorer...
-    if exist "%~dp0dist\MCS-AutoLogin-v1.0.zip" (
+    if exist "%~dp0dist\AutoLogin-v1.0.zip" (
+        explorer.exe /select,"%~dp0dist\AutoLogin-v1.0.zip"
+    ) else if exist "%~dp0dist\MCS-AutoLogin-v1.0.zip" (
         explorer.exe /select,"%~dp0dist\MCS-AutoLogin-v1.0.zip"
     ) else (
         explorer.exe "%~dp0dist"

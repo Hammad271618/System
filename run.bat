@@ -1,10 +1,12 @@
 @echo off
-title MCS Fortinet Auto-Login
+title AutoLogin
 cd /d "%~dp0"
 echo ========================================================
-echo        MCS Fortinet Auto-Login ^& Quota Rotator
+echo             AutoLogin ^& Quota Rotator
 echo ========================================================
-if exist "%~dp0MCS-AutoLogin.exe" (
+if exist "%~dp0AutoLogin.exe" (
+    start "" "%~dp0AutoLogin.exe"
+) else if exist "%~dp0MCS-AutoLogin.exe" (
     start "" "%~dp0MCS-AutoLogin.exe"
 ) else (
     python main.py

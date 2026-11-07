@@ -105,7 +105,7 @@ def run_dashboard():
 
             clear_screen()
             print(f"{C_CYAN}{C_BOLD}╔══════════════════════════════════════════════════════════════════════════════════════╗{C_RESET}")
-            print(f"{C_CYAN}{C_BOLD}║              MCS FORTINET AUTO-LOGIN & QUOTA ROTATOR DASHBOARD                       ║{C_RESET}")
+            print(f"{C_CYAN}{C_BOLD}║                       AUTOLOGIN & QUOTA ROTATOR DASHBOARD                            ║{C_RESET}")
             print(f"{C_CYAN}{C_BOLD}╚══════════════════════════════════════════════════════════════════════════════════════╝{C_RESET}")
             print(f" {C_DIM}Time:{C_RESET} {now_str}  │  {C_DIM}Internet:{C_RESET} {badge}  │  {C_DIM}Latency:{C_RESET} {telemetry['latency_ms'] or '---'} ms")
             print(f"{C_DIM}────────────────────────────────────────────────────────────────────────────────────────{C_RESET}")

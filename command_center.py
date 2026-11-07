@@ -369,14 +369,14 @@ class CommandCenter:
         print(f"{C_GREEN}{C_BOLD}[SUCCESS] All {stats['total']} accounts have been reset to AVAILABLE!{C_RESET}")
 
     def cmd_roam(self):
-        """Scans for nearby MCS Wi-Fi access points and roams to the strongest one."""
+        """Scans for nearby Wi-Fi access points and roams to the strongest one."""
         print(f"{C_YELLOW}[...] Scanning 2.4GHz & 5GHz Wi-Fi access points...{C_RESET}")
         nets = self.wifi_roamer.scan_networks()
         mcs_nets = [n for n in nets if n["is_mcs"]]
 
-        print(f"\n{C_CYAN}{C_BOLD}Detected MCS Access Points:{C_RESET}")
+        print(f"\n{C_CYAN}{C_BOLD}Detected Access Points:{C_RESET}")
         if not mcs_nets:
-            print(f"  {C_GRAY}(No MCS networks detected in range){C_RESET}")
+            print(f"  {C_GRAY}(No target networks detected in range){C_RESET}")
         else:
             for n in mcs_nets:
                 sig = n["signal"]
@@ -626,7 +626,7 @@ class CommandCenter:
                 # Handle navigation between main and more menus
                 if menu_mode == "main":
                     if low in ["0", "exit", "quit", "q"]:
-                        print(f"\n{C_CYAN}Exiting MCS Wi-Fi Assistant. Goodbye!{C_RESET}\n")
+                        print(f"\n{C_CYAN}Exiting AutoLogin Assistant. Goodbye!{C_RESET}\n")
                         break
                     elif low in ["6", "more", "tools", "advanced"]:
                         menu_mode = "more"
@@ -654,7 +654,7 @@ class CommandCenter:
                         menu_mode = "main"
                         continue
                     elif low in ["exit", "quit", "q"]:
-                        print(f"\n{C_CYAN}Exiting MCS Wi-Fi Assistant. Goodbye!{C_RESET}\n")
+                        print(f"\n{C_CYAN}Exiting AutoLogin Assistant. Goodbye!{C_RESET}\n")
                         break
                     elif low == "1":
                         self.cmd_add_account([])
@@ -682,7 +682,7 @@ class CommandCenter:
                             break
 
             except (KeyboardInterrupt, EOFError):
-                print(f"\n{C_CYAN}Exiting MCS Wi-Fi Assistant. Goodbye!{C_RESET}\n")
+                print(f"\n{C_CYAN}Exiting AutoLogin Assistant. Goodbye!{C_RESET}\n")
                 break
             except Exception as e:
                 print(f"{C_RED}[ERROR] {e}{C_RESET}")

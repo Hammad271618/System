@@ -8,16 +8,16 @@ import time
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 DIST_DIR = os.path.join(PROJECT_DIR, "dist")
 BUILD_DIR = os.path.join(PROJECT_DIR, "build")
-PACKAGE_NAME = "MCS-AutoLogin-v1.0"
+PACKAGE_NAME = "AutoLogin-v1.0"
 STAGE_DIR = os.path.join(DIST_DIR, PACKAGE_NAME)
 ZIP_OUTPUT = os.path.join(DIST_DIR, f"{PACKAGE_NAME}.zip")
 
 README_CONTENT = """========================================================================
-     MCS FORTINET AUTO-LOGIN & CMD COMMAND CENTRE (PORTABLE)
-                 Zero-Interruption Multi-Account Quota Hub
+             AUTOLOGIN & COMMAND CENTRE (PORTABLE)
+                 Multi-Profile Connection Hub
 ========================================================================
 
-Welcome to the portable distribution of MCS Fortinet Auto-Login!
+Welcome to the portable distribution of AutoLogin!
 This package is fully self-contained and runs on Windows 10 & 11 without
 requiring Python or manual library installation.
 
@@ -26,23 +26,23 @@ QUICK START GUIDE
 ------------------------------------------------------------------------
 
 1. COMMAND CENTRE (Recommended Hub):
-   - Double-click 'command_center.bat' or run 'MCS-CommandCenter.exe'
-   - Displays real-time Wi-Fi, IP, captive portal status, and account pool.
+   - Double-click 'command_center.bat' or run 'CommandCenter.exe'
+   - Displays real-time network, IP, captive portal status, and account pool.
    - Quick commands:
        * status    : Full system telemetry
-       * switch    : Advance to next account & authenticate
-       * accounts  : View all 29 accounts and quotas
-       * roam      : Roam to strongest MCS Wi-Fi access point
-       * fix-ip    : Auto-heal DHCP exhaustion / Assign static IP
+       * switch    : Advance to random account & authenticate
+       * accounts  : View all accounts and quotas
+       * roam      : Roam to strongest Wi-Fi access point
+       * fix-ip    : Auto-heal DHCP / Clean renew
        * dhcp      : Revert adapter back to dynamic DHCP
        * start-bg  : Launch background tray daemon
        * stop-bg   : Stop background tray daemon
        * dashboard : Open full-screen real-time visual monitor
 
 2. BACKGROUND SYSTEM TRAY SERVICE:
-   - Double-click 'run.bat' or 'MCS-AutoLogin.exe'
+   - Double-click 'run.bat' or 'AutoLogin.exe' (or 'start_silent.vbs')
    - Sits silently in your Windows System Tray (near clock).
-   - Monitors network health every few seconds:
+   - Monitors network health:
        * Green dot : Online & authenticated
        * Yellow dot: Portal detected / logging in
        * Gray dot  : Offline / disconnected
@@ -97,14 +97,14 @@ def compile_executables(skip_pyinstaller=False):
         print("  -> Installing pyinstaller via pip...")
         subprocess.check_call([python_exe, "-m", "pip", "install", "pyinstaller"])
 
-    # 1. Compile MCS-AutoLogin.exe (Windowless tray daemon)
-    print("  -> Compiling MCS-AutoLogin.exe (Tray Service)...")
+    # 1. Compile AutoLogin.exe (Windowless tray daemon)
+    print("  -> Compiling AutoLogin.exe (Tray Service)...")
     cmd_tray = [
         python_exe, "-m", "PyInstaller",
         "--noconsole",
         "--onefile",
         "--clean",
-        "--name", "MCS-AutoLogin",
+        "--name", "AutoLogin",
         "--distpath", STAGE_DIR,
         "--workpath", os.path.join(BUILD_DIR, "autologin"),
         "--specpath", BUILD_DIR,
@@ -124,18 +124,18 @@ def compile_executables(skip_pyinstaller=False):
     t0 = time.time()
     res1 = subprocess.run(cmd_tray, capture_output=True, text=True)
     if res1.returncode != 0:
-        print(f"PyInstaller build failed for MCS-AutoLogin:\n{res1.stderr}")
-        raise RuntimeError("MCS-AutoLogin build failed")
-    print(f"  -> MCS-AutoLogin.exe built in {int(time.time() - t0)}s.")
+        print(f"PyInstaller build failed for AutoLogin:\n{res1.stderr}")
+        raise RuntimeError("AutoLogin build failed")
+    print(f"  -> AutoLogin.exe built in {int(time.time() - t0)}s.")
 
-    # 2. Compile MCS-CommandCenter.exe (Console application)
-    print("  -> Compiling MCS-CommandCenter.exe (Command Centre & Dashboard)...")
+    # 2. Compile CommandCenter.exe (Console application)
+    print("  -> Compiling CommandCenter.exe (Command Centre & Dashboard)...")
     cmd_cli = [
         python_exe, "-m", "PyInstaller",
         "--console",
         "--onefile",
         "--clean",
-        "--name", "MCS-CommandCenter",
+        "--name", "CommandCenter",
         "--distpath", STAGE_DIR,
         "--workpath", os.path.join(BUILD_DIR, "commandcenter"),
         "--specpath", BUILD_DIR,
@@ -153,9 +153,9 @@ def compile_executables(skip_pyinstaller=False):
     t0 = time.time()
     res2 = subprocess.run(cmd_cli, capture_output=True, text=True)
     if res2.returncode != 0:
-        print(f"PyInstaller build failed for MCS-CommandCenter:\n{res2.stderr}")
-        raise RuntimeError("MCS-CommandCenter build failed")
-    print(f"  -> MCS-CommandCenter.exe built in {int(time.time() - t0)}s.")
+        print(f"PyInstaller build failed for CommandCenter:\n{res2.stderr}")
+        raise RuntimeError("CommandCenter build failed")
+    print(f"  -> CommandCenter.exe built in {int(time.time() - t0)}s.")
 
 def copy_distribution_assets():
     print("[3/5] Packaging configuration templates, launchers, and documentation...")
@@ -228,9 +228,13 @@ def build_from_frozen(app_dir):
 
     # Files to include in export archive
     target_files = [
+        "AutoLogin.exe",
+        "CommandCenter.exe",
         "MCS-AutoLogin.exe",
         "MCS-CommandCenter.exe",
         "accounts.json",
+        "accounts.enc",
+        "version.json",
         "command_center.bat",
         "run.bat",
         "dashboard.bat",
