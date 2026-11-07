@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "sc": "1001",
+    "name": "USER ONE",
+    "username": "user1",
+    "password": "password123",
+    "status": "available"
+  },
+  {
+    "id": 2,
+    "sc": "1002",
+    "name": "USER TWO",
+    "username": "user2",
+    "password": "password123",
+    "status": "available"
+  }
+]
